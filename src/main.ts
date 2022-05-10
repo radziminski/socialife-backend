@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 
-import { PORT, ASSETS_STORAGE } from './constants';
+import { API_PORT, ASSETS_STORAGE } from './constants';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -16,8 +16,8 @@ async function bootstrap() {
   if (ASSETS_STORAGE === 'local')
     app.useStaticAssets(join(__dirname, '..', 'files/audio'));
 
-  await app.listen(PORT);
-  console.log(`Listening on port ${PORT}...`);
+  await app.listen(API_PORT);
+  console.log(`Listening on port ${API_PORT}...`);
 }
 
 void bootstrap();

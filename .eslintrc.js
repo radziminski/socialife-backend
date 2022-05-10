@@ -2,24 +2,13 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: 'tsconfig.json',
+    tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: [
-    '@typescript-eslint/eslint-plugin',
-    'sort-keys-fix',
-    'typescript-sort-keys',
-    'import',
-  ],
+  plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
-    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier/@typescript-eslint',
     'plugin:prettier/recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
-    'plugin:typescript-sort-keys/recommended',
   ],
   root: true,
   env: {

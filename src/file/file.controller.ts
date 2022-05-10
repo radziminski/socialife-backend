@@ -18,7 +18,6 @@ import {
 import { FileService } from './file.service';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Roles } from '../auth/roles/roles.decorator';
@@ -54,7 +53,6 @@ export class FileController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
     await this.fileService.remove(+id);
-    return;
   }
 
   @UseGuards(ThrottlerGuard, JwtAuthGuard)

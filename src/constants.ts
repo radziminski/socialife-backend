@@ -5,7 +5,8 @@ import * as winston from 'winston';
 export const ENV: 'dev' | 'prod' =
   process.env.NODE_ENV === 'development' ? 'dev' : 'prod';
 export const REQUESTS_PER_MINUTE_LIMIT = 300;
-export const PASSWORD_REGEX = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
+export const PASSWORD_REGEX =
+  /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
 // AUTH
 export const { JWT_SECRET } = process.env;
@@ -32,7 +33,7 @@ export const { PG_HOST } = process.env;
 export const { PG_DATABASE } = process.env;
 export const { PG_PASSWORD } = process.env;
 export const { PG_PORT } = process.env;
-export const { PORT } = process.env;
+export const { API_PORT } = process.env;
 
 // AWS RDS ENV
 export const { RDS_USERNAME } = process.env;
