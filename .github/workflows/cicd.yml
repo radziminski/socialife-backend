@@ -1,1 +1,18 @@
-# todo
+name: Test and deploy the api
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Run unit tests 👮‍♀️
+        run: echo "workflow working! 😄"
