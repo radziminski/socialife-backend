@@ -7,7 +7,6 @@ services:
       - POSTGRES_PASSWORD=${PG_PASSWORD}
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
-      - ./postgres/queries:/docker-entrypoint-initdb.d/
     ports:
       - 5432:5432
 
@@ -28,12 +27,11 @@ services:
     restart: unless-stopped
     build:
       dockerfile: Dockerfile.dev
-      context: './api'
     depends_on:
       - postgres
     volumes:
       - /app/node_modules
-      - ./api:/app
+      - .:/app
     environment:
       - PG_USER=${PG_USER}
       - PG_PASSWORD=${PG_PASSWORD}
