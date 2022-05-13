@@ -26,7 +26,7 @@ import { Roles } from '../auth/roles/roles.decorator';
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Roles(UserRole.Admin, UserRole.Editor)
+  @Roles(UserRole.Admin)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll() {
@@ -34,21 +34,21 @@ export class FileController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(UserRole.Admin, UserRole.Editor)
+  @Roles(UserRole.Admin)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.fileService.findOne(+id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(UserRole.Admin, UserRole.Editor)
+  @Roles(UserRole.Admin)
   @Put(':id')
   update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
     return this.fileService.update(+id, updateFileDto);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(UserRole.Admin, UserRole.Editor)
+  @Roles(UserRole.Admin)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
@@ -56,7 +56,7 @@ export class FileController {
   }
 
   @UseGuards(ThrottlerGuard, JwtAuthGuard)
-  @Roles(UserRole.Admin, UserRole.Editor)
+  @Roles(UserRole.Admin)
   @Throttle(5, 60 * 5)
   @Post('upload')
   @UseInterceptors(

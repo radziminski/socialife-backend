@@ -11,6 +11,8 @@ import { AuthModule } from './auth/auth.module';
 import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
 import { APP_GUARD } from '@nestjs/core';
+import { EventModule } from './event/event.module';
+import { TicketModule } from './ticket/ticket.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { APP_GUARD } from '@nestjs/core';
     AuthModule,
     FileModule,
     ProjectModule,
+    EventModule,
+    TicketModule,
   ],
   providers: [
     {

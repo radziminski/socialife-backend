@@ -12,12 +12,12 @@ export class ChangePasswordDto {
   @MinLength(8, {
     message: 'Password should be at least 8 characters long',
   })
-  @MaxLength(50, {
-    message: 'Password should be maximum 50 characters long',
+  @MaxLength(20, {
+    message: 'Password should be maximum 20 characters long',
   })
   @Matches(PASSWORD_REGEX, {
     message:
       'Password should contain at least one lowercase and uppercase letter',
   })
-  new_password: string;
+  newPassword: string;
 }

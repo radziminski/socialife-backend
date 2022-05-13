@@ -1,4 +1,3 @@
-import { RequestWithUser } from './../types/index';
 import { ROLES_KEY } from './../roles/roles.decorator';
 import { UserRole } from './../roles/user-role.enum';
 import {
@@ -6,8 +5,10 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { RequestWithUser } from '../auth.types';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -29,8 +30,8 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException({ message: 'User does not exist' });
     }
 
-    if (!requiredRoles.some((role) => user.roles?.includes(role))) {
-      throw new UnauthorizedException({
+    if (!requiredRoles.some((role) => user.role === role)) {
+      throw new ForbiddenException({
         message: "You don't have enough permissions to perform this request.",
       });
     }

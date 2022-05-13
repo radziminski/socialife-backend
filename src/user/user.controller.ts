@@ -1,7 +1,6 @@
 import { RolesGuard } from './../auth/guards/user-roles.guard';
 import { UserRole } from './../auth/roles/user-role.enum';
 import { Roles } from './../auth/roles/roles.decorator';
-import { RequestWithUser } from './../auth/types/index';
 import { JwtAuthGuard } from './../auth/guards/jwt-auth.guard';
 import {
   Controller,
@@ -18,13 +17,14 @@ import {
 
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RequestWithUser } from '../auth/auth.types';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.Admin, UserRole.Editor)
+  @Roles(UserRole.Admin)
   @Get('all')
   async getAllUsers() {
     return this.userService.findAll();

@@ -78,6 +78,3 @@ export const WINSTON_FILE_LOGGERS: winston.transports.FileTransportOptions[] = [
     dirname: LOGS_DIR,
   },
 ];
-
-// Audio
-export const supportedMimes = ['audio/mpeg', 'audio/wave', 'audio/wav'];

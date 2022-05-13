@@ -1,5 +1,4 @@
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { RequestWithUser } from './types/index';
 import {
   Controller,
   Post,
@@ -17,6 +16,7 @@ import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RequestWithUser } from './auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -39,7 +39,7 @@ export class AuthController {
     @Body() body: ChangePasswordDto,
   ) {
     await this.userService.updatePassword(req.user.email, {
-      password: body.new_password,
+      password: body.newPassword,
     });
 
     return {
@@ -60,8 +60,8 @@ export class AuthController {
     const {
       email,
       password,
-      first_name: firstName,
-      last_name: lastName,
+      firstName: firstName,
+      lastName: lastName,
     } = registerDto;
 
     try {
@@ -79,10 +79,7 @@ export class AuthController {
 
       return { user, tokens };
     } catch (error) {
-      throw new BadRequestException({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        error,
-      });
+      throw new BadRequestException({ error });
     }
   }
 }

@@ -4,8 +4,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserService } from '../user/user.service';
-import { LoginCredentials } from './types';
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from '../constants';
+import { LoginCredentials } from '../../dist/auth/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +29,7 @@ export class AuthService {
     )
       throw new UnauthorizedException();
 
-    return { id: foundUser.id, email: foundUser.email, roles: foundUser.roles };
+    return { id: foundUser.id, email: foundUser.email, roles: foundUser.role };
   }
 
   getToken(user: { email: string; id: number }) {
@@ -92,7 +92,7 @@ export class AuthService {
       {
         email: email.toLowerCase(),
         password: hashedPassword,
-        roles: [UserRole.User, UserRole.Admin, UserRole.Editor],
+        role: UserRole.Admin,
       },
       {
         firstName: 'Admin',

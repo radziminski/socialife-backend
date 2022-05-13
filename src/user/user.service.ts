@@ -12,13 +12,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>, // private readonly projectService: ProjectService,
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(user: { email: string; password: string; roles?: string[] }) {
+  async create(user: { email: string; password: string; role?: UserRole }) {
     return this.userRepository.save({
       ...user,
-      roles: user.roles ?? [UserRole.User],
+      role: user.role ?? UserRole.User,
     });
   }
 
@@ -26,7 +26,7 @@ export class UserService {
     user: {
       email: string;
       password: string;
-      roles?: string[];
+      role?: UserRole;
     },
     profile: {
       firstName: string;
@@ -39,7 +39,7 @@ export class UserService {
 
     const createdUser = await this.userRepository.save({
       ...user,
-      roles: user.roles ?? [UserRole.User],
+      role: user.role ?? UserRole.User,
       profile: userProfile,
     });
 
@@ -66,7 +66,7 @@ export class UserService {
     return this.userRepository.findOne({
       relations: ['profile'],
       where: { email },
-      select: ['id', 'email', 'password', 'roles'],
+      select: ['id', 'email', 'password', 'role'],
     });
   }
 

@@ -1,3 +1,5 @@
+import { UserRole } from './roles/user-role.enum';
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -6,8 +8,9 @@ export interface LoginCredentials {
 export interface RequestUser {
   email: string;
   id: number;
-  roles: string[];
+  role: UserRole;
 }
+
 export type RequestWithUser = Request & {
   user: RequestUser;
 };

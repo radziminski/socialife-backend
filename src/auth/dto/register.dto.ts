@@ -16,8 +16,8 @@ export class RegisterDto {
   @MinLength(8, {
     message: 'Password should be at least 8 characters long',
   })
-  @MaxLength(50, {
-    message: 'Password should be maximum 50 characters long',
+  @MaxLength(20, {
+    message: 'Password should be maximum 20 characters long',
   })
   @Matches(PASSWORD_REGEX, {
     message:
@@ -27,9 +27,9 @@ export class RegisterDto {
 
   @IsString()
   @IsOptional()
-  first_name: string;
+  firstName: string;
 
   @IsString()
   @IsOptional()
-  last_name: string;
+  lastName: string;
 }
