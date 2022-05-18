@@ -7,12 +7,26 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
 
+      - name: Use Node v${{ matrix.node-version }} 🧑🏻‍💻
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install npm dependencies 👪
+        run: npm ci
+
+      - name: Lint & format code 🧹
+        run: npm run lint && npm run format
+
       - name: Run unit tests 👮‍♀️
-        run: echo "workflow working! 😄"
+        run: npm run test
