@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -24,12 +23,4 @@ export class RegisterDto {
       'Password should contain at least one lowercase and uppercase letter',
   })
   password: string;
-
-  @IsString()
-  @IsOptional()
-  firstName: string;
-
-  @IsString()
-  @IsOptional()
-  lastName: string;
 }

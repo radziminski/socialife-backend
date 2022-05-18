@@ -38,9 +38,7 @@ export class AuthController {
     @Request() req: RequestWithUser,
     @Body() body: ChangePasswordDto,
   ) {
-    await this.userService.updatePassword(req.user.email, {
-      password: body.newPassword,
-    });
+    await this.authService.updatePassword(req.user.email, body.newPassword);
 
     return {
       message: 'Password changed.',
@@ -51,26 +49,55 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     const user = await this.userService.findOneByEmail(
       registerDto.email.toLowerCase(),
+      false,
     );
+
     if (user)
       throw new BadRequestException({
         message: 'The user with given email already exists.',
       });
 
-    const {
-      email,
-      password,
-      firstName: firstName,
-      lastName: lastName,
-    } = registerDto;
+    const { email, password } = registerDto;
 
     try {
       const user = await this.authService.createUser({
         email,
         password,
-        firstName,
-        lastName,
       });
+
+      const tokens = this.authService.getToken({
+        email: user.email,
+        id: user.id,
+      });
+
+      return { user, tokens };
+    } catch (error) {
+      throw new BadRequestException({ error });
+    }
+  }
+
+  @Post('register-organization')
+  async registerOrganization(@Body() registerDto: RegisterDto) {
+    const user = await this.userService.findOneByEmail(
+      registerDto.email.toLowerCase(),
+      false,
+    );
+
+    if (user)
+      throw new BadRequestException({
+        message: 'The organization with given email already exists.',
+      });
+
+    const { email, password } = registerDto;
+
+    try {
+      const user = await this.authService.createUser(
+        {
+          email,
+          password,
+        },
+        true,
+      );
 
       const tokens = this.authService.getToken({
         email: user.email,

@@ -6,6 +6,7 @@ import { UserRole } from './roles/user-role.enum';
 import { UserService } from '../user/user.service';
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from '../constants';
 import { LoginCredentials } from './auth.types';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -64,25 +65,15 @@ export class AuthService {
     return user;
   }
 
-  async createUser(user: {
-    email: string;
-    firstName?: string;
-    lastName?: string;
-    password: string;
-  }) {
-    const { email, password, firstName, lastName } = user;
+  async createUser(user: RegisterDto, isOrganization?: boolean) {
+    const { email, password } = user;
     const hashedPassword = await this.bcryptHash(password);
 
-    const created = await this.userService.createWithProfile(
-      {
-        email: email.toLowerCase(),
-        password: hashedPassword,
-      },
-      {
-        firstName,
-        lastName,
-      },
-    );
+    const created = await this.userService.create({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role: isOrganization ? UserRole.Organization : UserRole.User,
+    });
 
     return {
       ...created,
@@ -90,21 +81,23 @@ export class AuthService {
     };
   }
 
+  async updatePassword(userEmail: string, newPassword: string) {
+    const hashedPassword = await this.bcryptHash(newPassword);
+
+    return this.userService.updatePassword(userEmail, {
+      password: hashedPassword,
+    });
+  }
+
   async createAdminUser() {
     const email = ADMIN_EMAIL;
     const hashedPassword = await this.bcryptHash(ADMIN_PASSWORD);
 
-    const created = await this.userService.createWithProfile(
-      {
-        email: email.toLowerCase(),
-        password: hashedPassword,
-        role: UserRole.Admin,
-      },
-      {
-        firstName: 'Admin',
-        lastName: 'User',
-      },
-    );
+    const created = await this.userService.create({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role: UserRole.Admin,
+    });
 
     return {
       ...created,

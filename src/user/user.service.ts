@@ -21,30 +21,28 @@ export class UserService {
     });
   }
 
-  async createWithProfile(
-    user: {
-      email: string;
-      password: string;
-      role?: UserRole;
-    },
+  async createProfile(
+    email: string,
     profile: {
       firstName: string;
-      lastName: string;
+      lastName?: string;
     },
   ) {
     const userProfile = new Profile();
     userProfile.firstName = profile.firstName;
     userProfile.lastName = profile.lastName;
 
-    const createdUser = await this.userRepository.save({
-      ...user,
-      role: user.role ?? UserRole.User,
-      profile: userProfile,
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['profile'],
     });
 
-    // await this.projectService.createDemoProject(createdUser.email);
+    if (!user) throw new BadRequestException({ message: 'User not found' });
 
-    return createdUser;
+    return this.userRepository.save({
+      ...user,
+      profile: userProfile,
+    });
   }
 
   async findOne(id: number) {
@@ -54,11 +52,16 @@ export class UserService {
     });
   }
 
-  async findOneByEmail(email: string) {
-    return this.userRepository.findOne({
+  async findOneByEmail(email: string, validate = true) {
+    const user = await this.userRepository.findOne({
       relations: ['profile'],
       where: { email },
     });
+
+    if (!user && validate)
+      throw new BadRequestException({ message: 'User not found' });
+
+    return user;
   }
 
   async findOneWithPwdByEmail(email: string) {
@@ -70,11 +73,7 @@ export class UserService {
   }
 
   async updateOne(email: string, newUser: UpdateUserDto) {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      relations: ['profile'],
-    });
-    if (!user) throw new BadRequestException({ message: 'User not found' });
+    const user = await this.findOneByEmail(email);
 
     return this.userRepository.save({
       ...user,
@@ -83,7 +82,9 @@ export class UserService {
   }
 
   async updatePassword(email: string, newUser: { password: string }) {
-    return this.userRepository.update(email, { password: newUser.password });
+    const user = await this.findOneByEmail(email);
+
+    return this.userRepository.save({ ...user, password: newUser.password });
   }
 
   async removeByEmail(email: string) {
