@@ -1,19 +1,28 @@
-import { UserRole } from './roles/user-role.enum';
-import { EncryptionService } from './../encryption/encryption.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 
+import { UserRole } from './roles/user-role.enum';
 import { UserService } from '../user/user.service';
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from '../constants';
-import { LoginCredentials } from '../../dist/auth/auth.types';
+import { LoginCredentials } from './auth.types';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly encryptionService: EncryptionService,
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
+
+  async bcryptHash(plaintext: string) {
+    const saltOrRounds = 10;
+    const hash = await bcrypt.hash(plaintext, saltOrRounds);
+    return hash;
+  }
+
+  async bcryptCompare(plaintext: string, hash: string) {
+    return bcrypt.compare(plaintext, hash);
+  }
 
   async validateUser(credentials: LoginCredentials) {
     const { email, password } = credentials;
@@ -22,10 +31,7 @@ export class AuthService {
     );
 
     if (
-      !(
-        foundUser &&
-        (await this.encryptionService.compare(password, foundUser.password))
-      )
+      !(foundUser && (await this.bcryptCompare(password, foundUser.password)))
     )
       throw new UnauthorizedException();
 
@@ -65,7 +71,7 @@ export class AuthService {
     password: string;
   }) {
     const { email, password, firstName, lastName } = user;
-    const hashedPassword = await this.encryptionService.hash(password);
+    const hashedPassword = await this.bcryptHash(password);
 
     const created = await this.userService.createWithProfile(
       {
@@ -86,7 +92,7 @@ export class AuthService {
 
   async createAdminUser() {
     const email = ADMIN_EMAIL;
-    const hashedPassword = await this.encryptionService.hash(ADMIN_PASSWORD);
+    const hashedPassword = await this.bcryptHash(ADMIN_PASSWORD);
 
     const created = await this.userService.createWithProfile(
       {

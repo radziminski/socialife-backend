@@ -1,9 +1,18 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { EventLike } from './event-like.entity';
-import { EventTicket } from './event-ticket.entity';
+import { TicketType } from '../../ticket/entities/ticket-type.entity';
+import { OrganizationProfile } from '../../user/entities/organization-profile.entity';
+import { EventFile } from './event-file.entity';
+import { BaseEntity } from '../../common/entity/base.entity';
 
 @Entity()
-export class Event {
+export class Event extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,11 +25,14 @@ export class Event {
   @Column()
   startDate: string;
 
-  @Column()
-  endDate: string;
+  @Column({ nullable: true })
+  endDate?: string;
 
-  @Column()
-  locationName: string;
+  @Column({ nullable: true })
+  locationName?: string;
+
+  @Column({ nullable: true })
+  locationRef?: string;
 
   @Column()
   longitude: number;
@@ -29,18 +41,29 @@ export class Event {
   latitude: number;
 
   @Column()
-  createdAt: string;
+  price: number;
 
   @Column({ nullable: true })
-  editedAt: string;
+  isCanceled?: boolean;
+
+  @ManyToOne(
+    () => OrganizationProfile,
+    (organizationProfile) => organizationProfile.events,
+  )
+  createdBy: OrganizationProfile;
+
+  @OneToMany(() => EventFile, (eventFile) => eventFile.event, {
+    cascade: true,
+  })
+  files: EventFile[];
 
   @OneToMany(() => EventLike, (eventLike) => eventLike.event, {
     cascade: true,
   })
   likes: EventLike[];
 
-  @OneToMany(() => EventTicket, (eventTicket) => eventTicket.event, {
+  @OneToMany(() => TicketType, (ticketType) => ticketType.event, {
     cascade: true,
   })
-  tickets: EventTicket[];
+  ticketTypes: TicketType[];
 }

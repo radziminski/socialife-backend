@@ -1,4 +1,3 @@
-import { EncryptionModule } from './../encryption/encryption.module';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -18,7 +17,6 @@ import { AuthController } from './auth.controller';
         signOptions: { expiresIn: JWT_EXPIRATION_S },
       }),
     }),
-    EncryptionModule,
     UserModule,
     PassportModule,
   ],

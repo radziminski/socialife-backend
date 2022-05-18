@@ -1,7 +1,6 @@
 import { Profile } from './profile.entity';
 import { UserRole } from '../../auth/roles/user-role.enum';
-import { OneToMany } from 'typeorm';
-import { EventLike } from '../../event/entities/event-like.entity';
+import { BaseEntity } from '../../common/entity/base.entity';
 import {
   Column,
   Entity,
@@ -11,7 +10,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'user_auth' })
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -29,9 +28,6 @@ export class User {
   role: UserRole;
 
   @OneToOne(() => Profile, { cascade: true })
-  @JoinColumn({ name: 'profile_id' })
+  @JoinColumn()
   profile: Profile;
-
-  @OneToMany(() => EventLike, (eventLike) => eventLike.user)
-  eventLikes: EventLike[];
 }

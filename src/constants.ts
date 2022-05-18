@@ -5,10 +5,11 @@ import * as winston from 'winston';
 export const ENV: 'dev' | 'prod' =
   process.env.NODE_ENV === 'development' ? 'dev' : 'prod';
 export const REQUESTS_PER_MINUTE_LIMIT = 300;
-export const PASSWORD_REGEX =
-  /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
+export const VERSION = '1.0';
 
 // AUTH
+export const PASSWORD_REGEX =
+  /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 export const { JWT_SECRET } = process.env;
 export const JWT_EXPIRATION_S = `${60 * 60}s`;
 export const { ADMIN_EMAIL } = process.env;
@@ -60,7 +61,7 @@ export const PROVIDERS = {
 };
 
 // LOGS
-export const LOGS_DIR = './logs';
+export const LOGS_DIR = './.logs';
 export const WINSTON_FILE_LOGGERS: winston.transports.FileTransportOptions[] = [
   {
     filename: 'errors.log',

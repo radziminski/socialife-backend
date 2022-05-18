@@ -1,8 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { FileType } from '../file.types';
+import { EventFile } from '../../event/entities/event-file.entity';
+import { BaseEntity } from '../../common/entity/base.entity';
 
 @Entity()
-export class File {
+export class File extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,6 +20,9 @@ export class File {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  isOrganizationCover?: boolean;
+
   @Column({
     type: 'enum',
     enum: FileType,
@@ -26,14 +31,14 @@ export class File {
   type: FileType;
 
   @Column({ nullable: true })
-  originalName: string;
-
-  @Column()
-  createdAt: string;
+  originalName?: string;
 
   @Column({ nullable: true })
-  size: number;
+  size?: number;
 
-  @Column({ name: 'mime_type' })
+  @Column()
   mimeType: string;
+
+  @OneToMany(() => EventFile, (eventFile) => eventFile.file)
+  eventFiles: EventFile[];
 }

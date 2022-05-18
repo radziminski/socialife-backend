@@ -1,21 +1,19 @@
-import { PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { EventTicket } from '../../event/entities/event-ticket.entity';
-export class Ticket {
+import { PrimaryGeneratedColumn, Column, ManyToOne, Entity } from 'typeorm';
+import { TicketType } from './ticket-type.entity';
+import { Profile } from '../../user/entities/profile.entity';
+import { BaseEntity } from '../../common/entity/base.entity';
+
+@Entity()
+export class Ticket extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  title: string;
+  secret: string;
 
-  @Column()
-  description: string;
+  @ManyToOne(() => Profile, (profile) => profile.tickets)
+  owner: Profile;
 
-  @Column()
-  createdAt: string;
-
-  @Column({ nullable: true })
-  editedAt: string;
-
-  @OneToMany(() => EventTicket, (eventTicket) => eventTicket.ticket)
-  eventTickets: EventTicket[];
+  @ManyToOne(() => TicketType, (ticketType) => ticketType.tickets)
+  type: TicketType;
 }

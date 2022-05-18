@@ -1,13 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Ticket } from '../../ticket/entities/ticket.entity';
+import { EventLike } from '../../event/entities/event-like.entity';
+import { BaseEntity } from 'src/common/entity/base.entity';
 
 @Entity()
-export class Profile {
+export class Profile extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'first_name', nullable: true })
-  firstName?: string;
+  @Column()
+  firstName: string;
 
-  @Column({ name: 'last_name', nullable: true })
-  lastName: string;
+  @Column({ nullable: true })
+  lastName?: string;
+
+  @OneToMany(() => EventLike, (eventLike) => eventLike.user)
+  eventLikes: EventLike[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.owner)
+  tickets: Ticket[];
 }

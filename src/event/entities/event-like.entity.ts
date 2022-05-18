@@ -1,35 +1,22 @@
-import { User } from '../../user/entities/user.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Event } from './event.entity';
+import { Profile } from '../../user/entities/profile.entity';
+import { BaseEntity } from '../../common/entity/base.entity';
 
 @Entity()
-export class EventLike {
+export class EventLike extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.eventLikes, {
+  @ManyToOne(() => Profile, (profile) => profile.eventLikes, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'userId' })
-  user: User;
-
-  @Column({ name: 'userId' })
-  userId: number;
+  user: Profile;
 
   @ManyToOne(() => Event, (event) => event.likes, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'eventId' })
   event: Event;
-
-  @Column({ name: 'eventId' })
-  eventId: number;
 }

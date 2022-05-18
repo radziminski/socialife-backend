@@ -86,8 +86,6 @@ export class FileService {
         name: name ?? file.originalname,
         size: file.size,
         mimeType: file.mimetype,
-        length: fileMetadata?.format.duration,
-        bitRate: fileMetadata?.format.bitrate,
       };
     } else {
       fileData = {
@@ -98,8 +96,6 @@ export class FileService {
         name: name ?? file.originalname,
         size: file.size,
         mimeType: file.mimetype,
-        length: fileMetadata?.format.duration,
-        bitRate: fileMetadata?.format.bitrate,
       };
     }
 

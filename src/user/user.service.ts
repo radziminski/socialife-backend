@@ -1,4 +1,3 @@
-// import { ProjectService } from './../project/project.service';
 import { Repository } from 'typeorm/repository/Repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
