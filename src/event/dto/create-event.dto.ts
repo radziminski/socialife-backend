@@ -1,4 +1,5 @@
-import { IsNumberString, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
+import { EventCategory } from '../event-category.enum';
 
 export class CreateEventDto {
   @IsString()
@@ -27,4 +28,8 @@ export class CreateEventDto {
 
   @IsNumberString()
   latitude: string;
+
+  @IsEnum(EventCategory)
+  @IsOptional()
+  category: EventCategory;
 }

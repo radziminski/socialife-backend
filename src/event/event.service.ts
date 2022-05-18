@@ -40,6 +40,7 @@ export class EventService {
     event.longitude = createEventDto.longitude;
     event.locationName = createEventDto.locationName;
     event.locationRef = createEventDto.locationRef;
+    event.category = createEventDto.category;
     event.createdBy = profile;
 
     return this.eventRepository.save(event);

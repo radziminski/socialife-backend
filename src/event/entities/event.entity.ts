@@ -10,6 +10,7 @@ import { TicketType } from '../../ticket/entities/ticket-type.entity';
 import { OrganizationProfile } from '../../user/entities/organization-profile.entity';
 import { EventFile } from './event-file.entity';
 import { BaseEntity } from '../../common/entity/base.entity';
+import { EventCategory } from '../event-category.enum';
 
 @Entity()
 export class Event extends BaseEntity {
@@ -42,6 +43,13 @@ export class Event extends BaseEntity {
 
   @Column({ nullable: true })
   isCanceled: boolean | null;
+
+  @Column({
+    type: 'enum',
+    enum: EventCategory,
+    default: EventCategory.Music,
+  })
+  category: EventCategory;
 
   @ManyToOne(
     () => OrganizationProfile,
