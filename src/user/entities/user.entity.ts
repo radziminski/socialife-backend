@@ -1,6 +1,7 @@
 import { Profile } from './profile.entity';
 import { UserRole } from '../../auth/roles/user-role.enum';
 import { BaseEntity } from '../../common/entity/base.entity';
+import { OrganizationProfile } from './organization-profile.entity';
 import {
   Column,
   Entity,
@@ -30,4 +31,8 @@ export class User extends BaseEntity {
   @OneToOne(() => Profile, { cascade: true })
   @JoinColumn()
   profile: Profile;
+
+  @OneToOne(() => OrganizationProfile, { cascade: true })
+  @JoinColumn()
+  organizationProfile: OrganizationProfile;
 }

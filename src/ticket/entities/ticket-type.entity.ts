@@ -19,7 +19,7 @@ export class TicketType extends BaseEntity {
   title: string;
 
   @Column({ nullable: true })
-  description: string;
+  description: string | null;
 
   @Column()
   price: number;

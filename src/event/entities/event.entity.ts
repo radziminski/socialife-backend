@@ -26,13 +26,13 @@ export class Event extends BaseEntity {
   startDate: string;
 
   @Column({ nullable: true })
-  endDate?: string;
+  endDate: string | null;
 
   @Column({ nullable: true })
-  locationName?: string;
+  locationName: string | null;
 
   @Column({ nullable: true })
-  locationRef?: string;
+  locationRef: string | null;
 
   @Column()
   longitude: number;
@@ -44,7 +44,7 @@ export class Event extends BaseEntity {
   price: number;
 
   @Column({ nullable: true })
-  isCanceled?: boolean;
+  isCanceled: boolean | null;
 
   @ManyToOne(
     () => OrganizationProfile,

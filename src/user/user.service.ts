@@ -5,7 +5,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UserRole } from '../auth/roles/user-role.enum';
 import { Profile } from './entities/profile.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
+import { CreateOrganizationProfileDto } from './dto/create-organization-profile.dto';
+import { OrganizationProfile } from './entities/organization-profile.entity';
+import { UpdateOrganizationProfileDto } from './dto/update-organization-profile.dto';
+import {
+  isUpdateOrganizationProfileDto,
+  isCreateOrganizationProfileDto,
+} from './user.utils';
 
 @Injectable()
 export class UserService {
@@ -14,6 +22,8 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  // USERS
+
   async create(user: { email: string; password: string; role?: UserRole }) {
     return this.userRepository.save({
       ...user,
@@ -21,47 +31,40 @@ export class UserService {
     });
   }
 
-  async createProfile(
-    email: string,
-    profile: {
-      firstName: string;
-      lastName?: string;
-    },
-  ) {
-    const userProfile = new Profile();
-    userProfile.firstName = profile.firstName;
-    userProfile.lastName = profile.lastName;
-
-    const user = await this.userRepository.findOne({
-      where: { email },
-      relations: ['profile'],
-    });
-
-    if (!user) throw new BadRequestException({ message: 'User not found' });
-
-    return this.userRepository.save({
-      ...user,
-      profile: userProfile,
-    });
-  }
-
   async findOne(id: number) {
     return this.userRepository.findOne({
-      relations: ['profile'],
+      relations: ['profile', 'organizationProfile'],
       where: { id },
     });
   }
 
   async findOneByEmail(email: string, validate = true) {
     const user = await this.userRepository.findOne({
-      relations: ['profile'],
+      relations: ['profile', 'organizationProfile'],
       where: { email },
     });
 
-    if (!user && validate)
+    if (!user && validate) {
       throw new BadRequestException({ message: 'User not found' });
+    }
 
     return user;
+  }
+
+  async findOneByEmailWithUnifiedProfile(email: string, validate = true) {
+    const user = await this.findOneByEmail(email, validate);
+
+    const { profile, organizationProfile, ...restUser } = user;
+
+    return user.role === UserRole.Organization
+      ? {
+          ...restUser,
+          organizationProfile,
+        }
+      : {
+          ...restUser,
+          profile,
+        };
   }
 
   async findOneWithPwdByEmail(email: string) {
@@ -69,15 +72,6 @@ export class UserService {
       relations: ['profile'],
       where: { email },
       select: ['id', 'email', 'password', 'role'],
-    });
-  }
-
-  async updateOne(email: string, newUser: UpdateUserDto) {
-    const user = await this.findOneByEmail(email);
-
-    return this.userRepository.save({
-      ...user,
-      profile: { firstName: newUser.first_name, lastName: newUser.last_name },
     });
   }
 
@@ -99,5 +93,125 @@ export class UserService {
 
   async remove(id: number) {
     return this.userRepository.delete(id);
+  }
+
+  // PROFILES
+
+  async getProfile(email: string) {
+    const user = await this.findOneByEmail(email);
+
+    const profile = user.profile ?? user.organizationProfile;
+
+    if (!profile) {
+      throw new BadRequestException({
+        message: 'User does not have a profile',
+      });
+    }
+
+    return user.profile ?? user.organizationProfile;
+  }
+
+  async createProfile(
+    email: string,
+    role: UserRole,
+    profile: CreateProfileDto | CreateOrganizationProfileDto,
+  ) {
+    if (isCreateOrganizationProfileDto(profile)) {
+      if (role !== UserRole.Organization) {
+        throw new BadRequestException('User cannot have organization profile');
+      }
+
+      return this.createOrganizationProfile(email, profile);
+    }
+
+    if (role === UserRole.Organization) {
+      throw new BadRequestException('Organization cannot have user profile');
+    }
+
+    return this.createUserProfile(email, profile);
+  }
+
+  async createUserProfile(email: string, profile: CreateProfileDto) {
+    const user = await this.findOneByEmail(email);
+
+    if (user.profile) {
+      throw new BadRequestException('User already has profile');
+    }
+
+    const userProfile = new Profile();
+    userProfile.firstName = profile.firstName;
+    userProfile.lastName = profile.lastName;
+    userProfile.region = profile.region;
+
+    return this.userRepository.save({
+      ...user,
+      profile: userProfile,
+    });
+  }
+
+  async createOrganizationProfile(
+    email: string,
+    profile: CreateOrganizationProfileDto,
+  ) {
+    const organization = await this.findOneByEmail(email);
+
+    if (organization.organizationProfile) {
+      throw new BadRequestException('Organization already has profile');
+    }
+
+    const organizationProfile = new OrganizationProfile();
+    organizationProfile.name = profile.name;
+    organizationProfile.description = profile.description;
+    organizationProfile.website = profile.website;
+    organizationProfile.region = profile.region;
+    organizationProfile.city = profile.city;
+
+    return this.userRepository.save({
+      ...organization,
+      organizationProfile: organizationProfile,
+    });
+  }
+
+  async updateProfile(
+    email: string,
+    role: UserRole,
+    newProfile: UpdateProfileDto | UpdateOrganizationProfileDto,
+  ) {
+    if (isUpdateOrganizationProfileDto(newProfile)) {
+      if (role !== UserRole.Organization) {
+        throw new BadRequestException(
+          'User cannot update organization profile',
+        );
+      }
+
+      return this.updateOrganizationProfile(email, newProfile);
+    }
+
+    if (role === UserRole.Organization) {
+      throw new BadRequestException('Organization cannot update user profile');
+    }
+
+    return this.updateUserProfile(email, newProfile);
+  }
+
+  async updateUserProfile(email: string, newProfile: UpdateProfileDto) {
+    const user = await this.findOneByEmail(email);
+
+    return this.userRepository.save({
+      ...user,
+      profile: { ...user.profile, ...newProfile },
+    });
+  }
+
+  async updateOrganizationProfile(
+    email: string,
+    newProfile: UpdateOrganizationProfileDto,
+  ) {
+    const user = await this.findOneByEmail(email);
+
+    return this.userRepository.save({
+      ...user,
+      organizationProfile: { ...newProfile },
+    });
   }
 }

@@ -13,11 +13,15 @@ import {
   Request,
   HttpStatus,
   HttpCode,
+  Post,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestWithUser } from '../auth/auth.types';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateOrganizationProfileDto } from './dto/update-organization-profile.dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
+import { CreateOrganizationProfileDto } from './dto/create-organization-profile.dto';
 
 @Controller('user')
 export class UserController {
@@ -33,16 +37,40 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get()
   getMe(@Request() req: RequestWithUser) {
-    return this.userService.findOneByEmail(req.user.email);
+    return this.userService.findOneByEmailWithUnifiedProfile(req.user.email);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch()
-  updateMe(
+  @Get('profile')
+  getProfile(@Request() req: RequestWithUser) {
+    return this.userService.getProfile(req.user.email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile')
+  @HttpCode(HttpStatus.CREATED)
+  createProfile(
     @Request() req: RequestWithUser,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateProfile: CreateProfileDto | CreateOrganizationProfileDto,
   ) {
-    return this.userService.updateOne(req.user.email, updateUserDto);
+    return this.userService.createProfile(
+      req.user.email,
+      req.user.role,
+      updateProfile,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  updateProfile(
+    @Request() req: RequestWithUser,
+    @Body() updateProfile: UpdateProfileDto | UpdateOrganizationProfileDto,
+  ) {
+    return this.userService.updateProfile(
+      req.user.email,
+      req.user.role,
+      updateProfile,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

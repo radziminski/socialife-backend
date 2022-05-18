@@ -21,7 +21,7 @@ export class File extends BaseEntity {
   name: string;
 
   @Column({ nullable: true })
-  isOrganizationCover?: boolean;
+  isOrganizationCover: boolean | null;
 
   @Column({
     type: 'enum',
@@ -31,10 +31,10 @@ export class File extends BaseEntity {
   type: FileType;
 
   @Column({ nullable: true })
-  originalName?: string;
+  originalName: string | null;
 
   @Column({ nullable: true })
-  size?: number;
+  size: number | null;
 
   @Column()
   mimeType: string;
