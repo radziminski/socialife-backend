@@ -1,0 +1,7 @@
+{
+  "name": "Test organization",
+  "description": "Test organization created on api startup",
+  "region": "PL",
+  "city": "Warsaw",
+  "website": "https://radziminski.com"
+}

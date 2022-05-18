@@ -35,13 +35,10 @@ export class Event extends BaseEntity {
   locationRef: string | null;
 
   @Column()
-  longitude: number;
+  longitude: string;
 
   @Column()
-  latitude: number;
-
-  @Column()
-  price: number;
+  latitude: string;
 
   @Column({ nullable: true })
   isCanceled: boolean | null;
@@ -49,6 +46,7 @@ export class Event extends BaseEntity {
   @ManyToOne(
     () => OrganizationProfile,
     (organizationProfile) => organizationProfile.events,
+    { cascade: true },
   )
   createdBy: OrganizationProfile;
 

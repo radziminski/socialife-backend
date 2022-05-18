@@ -1,24 +1,6 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { Region } from '../region.enum';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateOrganizationProfileDto } from './create-organization-profile.dto';
 
-export class UpdateOrganizationProfileDto {
-  @IsString()
-  @IsOptional()
-  name?: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsString()
-  @IsOptional()
-  website?: string;
-
-  @IsEnum(Region)
-  @IsOptional()
-  region?: Region;
-
-  @IsString()
-  @IsOptional()
-  city?: string;
-}
+export class UpdateOrganizationProfileDto extends PartialType(
+  CreateOrganizationProfileDto,
+) {}

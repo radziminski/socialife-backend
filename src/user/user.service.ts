@@ -214,4 +214,10 @@ export class UserService {
       organizationProfile: { ...newProfile },
     });
   }
+
+  async checkIfHasProfile(email: string) {
+    const user = await this.findOneByEmail(email);
+
+    return Boolean(user.organizationProfile || user.profile);
+  }
 }

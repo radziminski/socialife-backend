@@ -1,16 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { Region } from '../region.enum';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateProfileDto } from './create-profile.dto';
 
-export class UpdateProfileDto {
-  @IsString()
-  @IsOptional()
-  firstName?: string;
-
-  @IsString()
-  @IsOptional()
-  lastName?: string;
-
-  @IsOptional()
-  @IsEnum(Region)
-  region?: Region;
-}
+export class UpdateProfileDto extends PartialType(CreateProfileDto) {}
