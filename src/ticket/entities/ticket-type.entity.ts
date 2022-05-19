@@ -24,6 +24,12 @@ export class TicketType extends BaseEntity {
   @Column()
   price: number;
 
+  @Column()
+  isAvailable: boolean;
+
+  @Column({ nullable: true })
+  availableTillDate: string | null;
+
   @ManyToOne(() => Event, (event) => event.ticketTypes)
   event: Event;
 

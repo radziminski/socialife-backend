@@ -1,4 +1,10 @@
-import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNumberString,
+  IsOptional,
+  IsString,
+  IsDateString,
+} from 'class-validator';
 import { EventCategory } from '../event-category.enum';
 
 export class CreateEventDto {
@@ -8,10 +14,10 @@ export class CreateEventDto {
   @IsString()
   description: string;
 
-  @IsString()
+  @IsDateString()
   startDate: string;
 
-  @IsString()
+  @IsDateString()
   @IsOptional()
   endDate?: string;
 

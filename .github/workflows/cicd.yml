@@ -25,6 +25,9 @@ jobs:
       - name: Install npm dependencies 👪
         run: npm ci
 
+      - name: Build app 🛠
+        run: npm run build
+
       - name: Lint & format code 🧹
         run: npm run lint && npm run format
 

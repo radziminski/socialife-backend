@@ -1,26 +1,117 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { CreateTicketTypeDto } from './dto/create-ticket-type.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TicketType } from './entities/ticket-type.entity';
+import { Repository } from 'typeorm/repository/Repository';
+import { EventService } from '../event/event.service';
+import { UpdateTicketTypeDto } from './dto/update-ticket-type.dto';
 
 @Injectable()
 export class TicketService {
-  create(createTicketDto: CreateTicketDto) {
-    return 'This action adds a new ticket';
+  constructor(
+    @InjectRepository(TicketType)
+    private readonly ticketTypeRepository: Repository<TicketType>,
+    private readonly eventService: EventService,
+  ) {}
+
+  async createType(
+    eventId: number,
+    organizationEmail: string,
+    createTicketTypeDto: CreateTicketTypeDto,
+  ) {
+    const event = await this.eventService.findOne(eventId);
+    await this.eventService.checkAuthor(event, organizationEmail);
+
+    const ticketType = new TicketType();
+    ticketType.title = createTicketTypeDto.title;
+    ticketType.description = createTicketTypeDto.description;
+    ticketType.availableTillDate = createTicketTypeDto.availableTillDate;
+    ticketType.price = createTicketTypeDto.price;
+    ticketType.isAvailable = true;
+    ticketType.event = event;
+    ticketType.tickets = [];
+
+    const newTicketType = await this.ticketTypeRepository.save(ticketType);
+    const { event: _, ...restTicketType } = newTicketType;
+
+    return restTicketType;
   }
 
-  findAll() {
-    return `This action returns all ticket`;
+  async findOneType(id: number, relations?: string[]) {
+    const ticketType = await this.ticketTypeRepository.findOne(id, {
+      relations,
+    });
+    if (!ticketType) {
+      throw new BadRequestException(`Ticket type with id ${id} does not exist`);
+    }
+
+    return ticketType;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ticket`;
+  async checkAuthorAndFindOneType(
+    id: number,
+    eventId: number,
+    authorEmail: string,
+  ) {
+    const ticketType = await this.findOneType(id, ['event', 'event.createdBy']);
+
+    if (ticketType.event.id !== eventId) {
+      throw new BadRequestException(
+        `Ticket type with id ${id} does not exist on this event`,
+      );
+    }
+
+    await this.eventService.checkAuthor(ticketType.event, authorEmail);
+
+    if (ticketType.event.id !== eventId) {
+      throw new BadRequestException(
+        'This event does not have such ticket type',
+      );
+    }
+
+    return ticketType;
   }
 
-  update(id: number, updateTicketDto: UpdateTicketDto) {
-    return `This action updates a #${id} ticket`;
+  async findTypesForEvent(eventId: number) {
+    const ticketTypes = await this.ticketTypeRepository.find({
+      where: {
+        event: {
+          id: eventId,
+        },
+      },
+    });
+
+    return ticketTypes;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} ticket`;
+  async updateType(
+    id: number,
+    eventId: number,
+    organizationEmail: string,
+    updateTicketTypeDto: UpdateTicketTypeDto,
+  ) {
+    const ticketType = await this.checkAuthorAndFindOneType(
+      id,
+      eventId,
+      organizationEmail,
+    );
+
+    const updatedTicketType = await this.ticketTypeRepository.save({
+      ...ticketType,
+      ...updateTicketTypeDto,
+    });
+    const { event: _, ...restTicketType } = updatedTicketType;
+
+    return restTicketType;
+  }
+
+  async deleteType(id: number, eventId: number, organizationEmail: string) {
+    const ticketType = await this.checkAuthorAndFindOneType(
+      id,
+      eventId,
+      organizationEmail,
+    );
+
+    return this.ticketTypeRepository.remove(ticketType);
   }
 }

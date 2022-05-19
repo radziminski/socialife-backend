@@ -42,6 +42,9 @@ export class EventService {
     event.locationRef = createEventDto.locationRef;
     event.category = createEventDto.category;
     event.createdBy = profile;
+    event.ticketTypes = [];
+    event.likes = [];
+    event.files = [];
 
     return this.eventRepository.save(event);
   }
