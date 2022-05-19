@@ -3,6 +3,7 @@ import { Ticket } from '../../ticket/entities/ticket.entity';
 import { EventLike } from '../../event/entities/event-like.entity';
 import { BaseEntity } from 'src/common/entity/base.entity';
 import { Region } from '../region.enum';
+import { Payment } from '../../payment/entities/payment.entity';
 
 @Entity()
 export class Profile extends BaseEntity {
@@ -27,4 +28,7 @@ export class Profile extends BaseEntity {
 
   @OneToMany(() => Ticket, (ticket) => ticket.owner)
   tickets: Ticket[];
+
+  @OneToMany(() => Payment, (payment) => payment.author)
+  payments: Payment[];
 }

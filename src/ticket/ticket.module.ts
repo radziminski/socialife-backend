@@ -11,5 +11,6 @@ import { EventModule } from '../event/event.module';
   imports: [TypeOrmModule.forFeature([Ticket, TicketType]), EventModule],
   controllers: [TicketController],
   providers: [TicketService],
+  exports: [TicketService],
 })
 export class TicketModule {}

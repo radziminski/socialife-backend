@@ -5,10 +5,14 @@ import { TicketType } from './entities/ticket-type.entity';
 import { Repository } from 'typeorm/repository/Repository';
 import { EventService } from '../event/event.service';
 import { UpdateTicketTypeDto } from './dto/update-ticket-type.dto';
+import { Profile } from '../user/entities/profile.entity';
+import { Ticket } from './entities/ticket.entity';
 
 @Injectable()
 export class TicketService {
   constructor(
+    @InjectRepository(Ticket)
+    private readonly ticketRepository: Repository<Ticket>,
     @InjectRepository(TicketType)
     private readonly ticketTypeRepository: Repository<TicketType>,
     private readonly eventService: EventService,
@@ -113,5 +117,19 @@ export class TicketService {
     );
 
     return this.ticketTypeRepository.remove(ticketType);
+  }
+
+  async createTicket(owner: Profile, ticketTypeId: number) {
+    const ticketType = await this.findOneType(ticketTypeId);
+
+    // TODO: add uid here
+    const secret = '12345';
+
+    const ticket = new Ticket();
+    ticket.secret = secret;
+    ticket.owner = owner;
+    ticket.type = ticketType;
+
+    return this.ticketRepository.save(ticket);
   }
 }

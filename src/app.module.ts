@@ -12,6 +12,7 @@ import { FileModule } from './file/file.module';
 import { APP_GUARD } from '@nestjs/core';
 import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TicketModule } from './ticket/ticket.module';
     FileModule,
     EventModule,
     TicketModule,
+    PaymentModule,
   ],
   providers: [
     {
