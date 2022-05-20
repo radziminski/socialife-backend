@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotAcceptableException,
+} from '@nestjs/common';
 import { CreateTicketTypeDto } from './dto/create-ticket-type.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TicketType } from './entities/ticket-type.entity';
@@ -7,6 +11,8 @@ import { EventService } from '../event/event.service';
 import { UpdateTicketTypeDto } from './dto/update-ticket-type.dto';
 import { Profile } from '../user/entities/profile.entity';
 import { Ticket } from './entities/ticket.entity';
+import { TICKET_SECRET_LENGTH } from '../payment/payment.constant';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class TicketService {
@@ -16,6 +22,7 @@ export class TicketService {
     @InjectRepository(TicketType)
     private readonly ticketTypeRepository: Repository<TicketType>,
     private readonly eventService: EventService,
+    private readonly userService: UserService,
   ) {}
 
   async createType(
@@ -122,8 +129,7 @@ export class TicketService {
   async createTicket(owner: Profile, ticketTypeId: number) {
     const ticketType = await this.findOneType(ticketTypeId);
 
-    // TODO: add uid here
-    const secret = '12345';
+    const secret = this.generateSecret();
 
     const ticket = new Ticket();
     ticket.secret = secret;
@@ -131,5 +137,77 @@ export class TicketService {
     ticket.type = ticketType;
 
     return this.ticketRepository.save(ticket);
+  }
+
+  generateSecret() {
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    const secret = [];
+    for (let i = 0; i < TICKET_SECRET_LENGTH; i++) {
+      secret.push(
+        characters.charAt(Math.floor(Math.random() * charactersLength)),
+      );
+    }
+    return secret.join('');
+  }
+
+  async findOne(id: number, relations?: string[]) {
+    const ticket = await this.ticketRepository.findOne(id, {
+      relations: relations ?? ['owner', 'type', 'type.event'],
+      select: ['id', 'secret'],
+    });
+
+    if (!ticket) {
+      throw new BadRequestException(`Ticket with id ${id} does not exist`);
+    }
+
+    return ticket;
+  }
+
+  async checkOwnerAndFindOne(id: number, email: string) {
+    const profile = await this.userService.findProfileByEmail(email);
+    const ticket = await this.findOne(id);
+
+    if (ticket.owner?.id !== profile.id) {
+      throw new BadRequestException(`User does not have ticket with id ${id}`);
+    }
+
+    return ticket;
+  }
+
+  async findUserTickets(email: string) {
+    const profile = await this.userService.findProfileByEmail(email);
+    return this.ticketRepository.find({
+      where: {
+        owner: {
+          id: profile.id,
+        },
+      },
+      relations: ['type', 'type.event'],
+    });
+  }
+
+  async checkTicketValidity(
+    organizationEmail: string,
+    eventId: number,
+    ticketTypeId: number,
+    ticketId: number,
+    ticketSecret: string,
+  ) {
+    const ticketType = await this.checkAuthorAndFindOneType(
+      ticketTypeId,
+      eventId,
+      organizationEmail,
+    );
+
+    const ticket = await this.findOne(ticketId);
+
+    if (ticket.secret === ticketSecret && ticket.type.id === ticketType.id) {
+      const { secret: _, ...restTicket } = ticket;
+      return restTicket;
+    }
+
+    throw new NotAcceptableException('Provided ticket is not valid');
   }
 }

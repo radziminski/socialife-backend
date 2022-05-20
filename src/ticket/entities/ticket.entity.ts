@@ -10,7 +10,7 @@ export class Ticket extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ select: false })
   secret: string;
 
   @ManyToOne(() => Profile, (profile) => profile.tickets)

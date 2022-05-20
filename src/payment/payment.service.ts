@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { GetPotentialPaymentDto } from './dto/get-potential-payment.dto';
 import { Payment } from './entities/payment.entity';
@@ -23,10 +23,10 @@ export class PaymentService {
     private readonly userService: UserService,
   ) {}
 
-  async getPotentialPayment(
-    getPotentialPayment: GetPotentialPaymentDto,
+  async getPaymentPriceDetails(
+    getPotentialPaymentDto: GetPotentialPaymentDto,
   ): Promise<PotentialPaymentDto> {
-    const { tickets, paymentMethod } = getPotentialPayment;
+    const { tickets, paymentMethod } = getPotentialPaymentDto;
     let netPrice = 0;
     const ticketPrices: TicketPriceDto[] = [];
 
@@ -65,15 +65,15 @@ export class PaymentService {
   }
 
   async create(email: string, createPaymentDto: CreatePaymentDto) {
-    const user = await this.userService.findOneByEmail(email);
-    const paymentDetails = await this.getPotentialPayment(createPaymentDto);
+    const profile = await this.userService.findProfileByEmail(email);
+    const paymentDetails = await this.getPaymentPriceDetails(createPaymentDto);
     const { netPrice, fees, vat, totalPrice } = paymentDetails;
 
     const payment = new Payment();
-    payment.author = user.profile;
-    payment.bankName = createPaymentDto.bankName;
+    payment.author = profile;
+    payment.bankName = createPaymentDto.bankName ?? '';
     payment.fees = fees;
-    payment.lastFourDigits = createPaymentDto.lastFourDigits;
+    payment.lastFourDigits = createPaymentDto.lastFourDigits ?? '';
     payment.method = createPaymentDto.paymentMethod;
     payment.netPrice = netPrice;
     payment.totalPrice = totalPrice;
@@ -85,19 +85,24 @@ export class PaymentService {
     for (const ticket of createPaymentDto.tickets) {
       for (let ticketNum = 0; ticketNum < ticket.amount; ticketNum++) {
         const newTicket = await this.ticketService.createTicket(
-          user.profile,
+          profile,
           ticket.ticketTypeId,
         );
         tickets.push(newTicket);
       }
     }
 
+    let shouldProcess = false;
+    if (Math.random() > 0.5) {
+      payment.status = PaymentStatus.Paid;
+    } else {
+      shouldProcess = true;
+    }
+
     payment.tickets = tickets;
     const newPayment = await this.paymentRepository.save(payment);
 
-    if (Math.random() > 0.5) {
-      newPayment.status = PaymentStatus.Paid;
-    } else {
+    if (shouldProcess) {
       void this.processPayment(newPayment.id);
     }
 
@@ -106,8 +111,8 @@ export class PaymentService {
 
   async processPayment(id: number) {
     try {
-      await new Promise((res) => setTimeout(res, Math.random() * 30000));
-      const payment = this.paymentRepository.findOne(id);
+      await new Promise((res) => setTimeout(res, Math.random() * 40000));
+      const payment = await this.paymentRepository.findOne(id);
       this.paymentRepository.save({
         ...payment,
         status: PaymentStatus.Paid,
@@ -115,15 +120,43 @@ export class PaymentService {
     } catch {}
   }
 
-  findAll() {
-    return `This action returns all payment`;
+  async getPayment(id: number) {
+    const payment = await this.paymentRepository.findOne(id, {
+      relations: ['tickets', 'author', 'tickets.type'],
+    });
+
+    if (!payment) {
+      throw new BadRequestException(`Payment with id ${id} does not exist`);
+    }
+
+    return payment;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
+  async validateUserAndGetPayment(id: number, email: string) {
+    const profile = await this.userService.findProfileByEmail(email);
+    const payment = await this.getPayment(id);
+
+    if (profile.id !== payment.author.id) {
+      throw new BadRequestException(
+        `User does not have a payment with od ${id}`,
+      );
+    }
+
+    const { author: _, ...restPayment } = payment;
+
+    return restPayment;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} payment`;
+  async getUserPayments(email: string) {
+    const profile = await this.userService.findProfileByEmail(email);
+    const payments = await this.paymentRepository.find({
+      where: {
+        author: {
+          id: profile.id,
+        },
+      },
+    });
+
+    return payments;
   }
 }

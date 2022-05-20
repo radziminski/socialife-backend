@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Request,
   UseGuards,
@@ -19,9 +18,21 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get('/calculate')
+  @Get()
+  get(@Request() req: RequestWithUser) {
+    return this.paymentService.getUserPayments(req.user.email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  getOne(@Request() req: RequestWithUser, @Param('id') id: string) {
+    return this.paymentService.validateUserAndGetPayment(+id, req.user.email);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('calculate')
   getPotentialPayment(@Body() getPotentialPaymentDto: GetPotentialPaymentDto) {
-    return this.paymentService.getPotentialPayment(getPotentialPaymentDto);
+    return this.paymentService.getPaymentPriceDetails(getPotentialPaymentDto);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -75,7 +75,7 @@ export class FileService {
   ): Promise<File> {
     let fileData: Partial<File> = {};
 
-    const fileMetadata = await this.getFileMetadata(file);
+    // const fileMetadata = await this.getFileMetadata(file);
 
     if (this.isMulterS3File(file)) {
       fileData = {

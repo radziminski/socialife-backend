@@ -51,6 +51,16 @@ export class UserService {
     return user;
   }
 
+  async findProfileByEmail(email: string, validate = true) {
+    const user = await this.findOneByEmail(email, validate);
+
+    if (!user.profile) {
+      throw new BadRequestException('User does not have a profile');
+    }
+
+    return user.profile;
+  }
+
   async findOneByEmailWithUnifiedProfile(email: string, validate = true) {
     const user = await this.findOneByEmail(email, validate);
 

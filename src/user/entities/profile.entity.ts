@@ -26,9 +26,9 @@ export class Profile extends BaseEntity {
   @OneToMany(() => EventLike, (eventLike) => eventLike.user)
   eventLikes: EventLike[];
 
-  @OneToMany(() => Ticket, (ticket) => ticket.owner)
+  @OneToMany(() => Ticket, (ticket) => ticket.owner, { cascade: true })
   tickets: Ticket[];
 
-  @OneToMany(() => Payment, (payment) => payment.author)
+  @OneToMany(() => Payment, (payment) => payment.author, { cascade: true })
   payments: Payment[];
 }

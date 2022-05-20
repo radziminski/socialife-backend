@@ -21,3 +21,5 @@ export const FEE_FOR_PAYMENT_METHOD: Record<PaymentMethod, PaymentFee> = {
 };
 
 export const VAT_PERCENT = 32;
+
+export const TICKET_SECRET_LENGTH = 16;

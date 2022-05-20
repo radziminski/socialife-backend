@@ -6,11 +6,18 @@ import {
   IsNumberString,
   IsString,
   ValidateNested,
+  IsNumber,
+  IsInt,
+  IsPositive,
 } from 'class-validator';
 import { PaymentMethod } from '../payment-method.enum';
 
 export class PaymentTicket {
+  @IsNumber()
   ticketTypeId: number;
+
+  @IsInt()
+  @IsPositive()
   amount: number;
 }
 

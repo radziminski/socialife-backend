@@ -28,7 +28,7 @@ export class Payment extends BaseEntity {
   @Column({ nullable: true })
   fees: number;
 
-  @Column()
+  @Column({ nullable: true })
   bankName: string;
 
   @Column({ nullable: true })
