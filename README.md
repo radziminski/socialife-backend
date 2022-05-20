@@ -1,4 +1,4 @@
-# Socialife - Backend
+# 🍸 Socialife - Backend
 
 Backend for socialife application 
 
