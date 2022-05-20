@@ -26,11 +26,12 @@ import { getRepository } from 'typeorm';
 import { diskStorage } from 'multer';
 import { IAudioMetadata, parseBuffer } from 'music-metadata';
 
-if (ENV === 'prod')
+if (ENV === 'prod') {
   AWS.config.update({
     accessKeyId: AWS_ACCESS_KEY_ID,
     secretAccessKey: AWS_SECRET_ACCESS_KEY,
   });
+}
 
 const s3 = new AWS.S3();
 
