@@ -25,11 +25,31 @@ jobs:
       - name: Install npm dependencies 👪
         run: npm ci
 
-      - name: Build app 🛠
-        run: npm run build
-
       - name: Lint & format code 🧹
         run: npm run lint && npm run format
 
+      - name: Build app 🛠
+        run: npm run build
+
       - name: Run unit tests 👮‍♀️
         run: npm run test
+
+      # Zips the deploy package
+      - name: Generate deployment package 👷🏻‍♂️
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd dist
+          zip -r deploy.zip . -x '*.git*'
+
+      # Deploys the package to AWS EB
+      - name: Deploy to EB 📤
+        if: github.ref == 'refs/heads/main'
+        uses: einaregilsson/beanstalk-deploy@v16
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: socialife
+          environment_name: socialife-prod-env
+          version_label: ${{ github.run_id }}
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: dist/deploy.zip
