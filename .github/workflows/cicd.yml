@@ -38,6 +38,8 @@ jobs:
       - name: Generate deployment package 👷🏻‍♂️
         if: github.ref == 'refs/heads/main'
         run: |
+          cp package.json dist
+          cp package-lock.json dist
           cd dist
           zip -r deploy.zip . -x '*.git*'
 
