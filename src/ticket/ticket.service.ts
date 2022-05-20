@@ -1,3 +1,4 @@
+import { EventStatsDto, EventTicketTypeStatsDto } from './dto/event-stats.dto';
 import {
   Injectable,
   BadRequestException,
@@ -209,5 +210,39 @@ export class TicketService {
     }
 
     throw new NotAcceptableException('Provided ticket is not valid');
+  }
+
+  async getStats(
+    eventId: number,
+    organizationEmail: string,
+  ): Promise<EventStatsDto> {
+    const event = await this.eventService.findOne(eventId, [
+      'ticketTypes',
+      'likes',
+    ]);
+    await this.eventService.checkAuthorFromId(eventId, organizationEmail);
+
+    const { ticketTypes } = event;
+    let totalNetPriceEarned = 0;
+    let totalSoldTicketsNum = 0;
+    const soldTickets: EventTicketTypeStatsDto[] = [];
+    for (const ticketType of ticketTypes) {
+      const type = await this.findOneType(ticketType.id, ['tickets']);
+      const ticketPriceEarned = type.price * type.tickets.length;
+      totalNetPriceEarned += type.price * type.tickets.length;
+      totalSoldTicketsNum += type.tickets.length;
+      soldTickets.push({
+        netPriceEarned: ticketPriceEarned,
+        soldTicketsNum: type.tickets.length,
+        ticketTypeId: type.id,
+      });
+    }
+
+    return {
+      totalNetPriceEarned,
+      totalSoldTicketsNum,
+      soldTickets,
+      likes: event.likes?.length ?? 0,
+    };
   }
 }

@@ -104,4 +104,11 @@ export class TicketController {
       validateTicketDto.ticketSecret,
     );
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.Admin, UserRole.Organization)
+  @Get(':eventId/stats')
+  getStats(@Request() req: RequestWithUser, @Param('eventId') eventId: string) {
+    return this.ticketService.getStats(+eventId, req.user.email);
+  }
 }
