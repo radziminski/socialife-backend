@@ -23,8 +23,9 @@ async function bootstrap() {
   if (ASSETS_STORAGE === 'local')
     app.useStaticAssets(join(__dirname, '..', 'files/audio'));
 
-  await app.listen(API_PORT);
-  console.log(`Listening on port ${API_PORT}...`);
+  const port = API_PORT ?? 8080;
+  await app.listen(port);
+  console.log(`Listening on port ${port}...`);
 }
 
 void bootstrap();
