@@ -38,10 +38,11 @@ jobs:
       - name: Generate deployment package 👷🏻‍♂️
         if: github.ref == 'refs/heads/main'
         run: |
-          rm .env
-          rm Dockerfile*
-          rm docker-compose*
-          rm README*
+          mkdir deployment
+          cp -r dist deployment
+          cp package* deployment
+          cp .nvmrc deployment
+          cd deployment
           zip -r deploy.zip . -x '*.git*'
 
       # Deploys the package to AWS EB
@@ -55,4 +56,4 @@ jobs:
           environment_name: socialife-prod-env
           version_label: ${{ github.run_id }}
           region: ${{ secrets.AWS_REGION }}
-          deployment_package: deploy.zip
+          deployment_package: deployment/deploy.zip
