@@ -11,7 +11,7 @@ export const VERSION = '1.0';
 export const PASSWORD_REGEX =
   /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 export const { JWT_SECRET } = process.env;
-export const JWT_EXPIRATION_S = `${60 * 60}s`;
+export const JWT_EXPIRATION_S = `${60 * 60 * 24 * 30}s`;
 export const { ADMIN_EMAIL } = process.env;
 export const { ADMIN_PASSWORD } = process.env;
 
