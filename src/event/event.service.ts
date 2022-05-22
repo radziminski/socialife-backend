@@ -82,9 +82,24 @@ export class EventService {
     return event;
   }
 
-  async findOneWithLikesNumber(id: number) {
-    const event = await this.findOne(id, ['createdBy', 'likes']);
+  async findOneWithLikesNumber(id: number, relations = ['createdBy', 'likes']) {
+    const event = await this.findOne(id, relations);
     return this.convertLikesToLikesNumber(event);
+  }
+
+  async findOneWithFirstLikes(id: number) {
+    const event = await this.findOne(id, [
+      'createdBy',
+      'ticketTypes',
+      'likes',
+      'likes.user',
+    ]);
+    const likes = [...(event.likes ?? [])].slice(0, 5);
+    const newEvent = this.convertLikesToLikesNumber(event);
+    return {
+      ...newEvent,
+      likes,
+    };
   }
 
   async checkAuthor(event: Event, authorEmail: string) {

@@ -17,6 +17,9 @@ export class OrganizationProfile extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  email: string | null;
+
   @Column()
   name: string;
 

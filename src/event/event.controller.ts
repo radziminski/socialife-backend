@@ -50,7 +50,7 @@ export class EventController {
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.eventService.findOne(+id, ['createdBy', 'ticketTypes']);
+    return this.eventService.findOneWithFirstLikes(+id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

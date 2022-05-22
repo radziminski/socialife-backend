@@ -149,6 +149,7 @@ export class UserService {
     }
 
     const userProfile = new Profile();
+    userProfile.email = user.email;
     userProfile.firstName = profile.firstName;
     userProfile.lastName = profile.lastName;
     userProfile.region = profile.region;
@@ -170,6 +171,7 @@ export class UserService {
     }
 
     const organizationProfile = new OrganizationProfile();
+    organizationProfile.email = organization.email;
     organizationProfile.name = profile.name;
     organizationProfile.description = profile.description;
     organizationProfile.website = profile.website;

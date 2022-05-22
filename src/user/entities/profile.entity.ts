@@ -10,6 +10,9 @@ export class Profile extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  email: string | null;
+
   @Column()
   firstName: string;
 
