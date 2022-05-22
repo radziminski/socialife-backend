@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsString,
   IsDateString,
+  IsArray,
 } from 'class-validator';
 import { EventCategory } from '../event-category.enum';
 
@@ -28,6 +29,11 @@ export class CreateEventDto {
   @IsString()
   @IsOptional()
   locationRef?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  externalImageUrls?: string[];
 
   @IsNumberString()
   longitude: string;

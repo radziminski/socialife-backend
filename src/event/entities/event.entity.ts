@@ -44,6 +44,9 @@ export class Event extends BaseEntity {
   @Column({ nullable: true })
   isCanceled: boolean | null;
 
+  @Column('text', { nullable: true, array: true, default: [] })
+  externalImageUrls: string[];
+
   @Column({
     type: 'enum',
     enum: EventCategory,

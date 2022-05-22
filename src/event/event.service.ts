@@ -43,6 +43,7 @@ export class EventService {
     event.category = createEventDto.category;
     event.createdBy = profile;
     event.ticketTypes = [];
+    event.externalImageUrls = [...(createEventDto.externalImageUrls ?? [])];
     event.likes = [];
     event.files = [];
 
