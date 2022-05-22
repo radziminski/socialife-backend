@@ -158,7 +158,12 @@ export class EventService {
   }
 
   async likeEvent(id: number, email: string) {
-    const event = await this.findOne(id, ['likes', 'likes.user']);
+    const event = await this.findOne(id, [
+      'likes',
+      'likes.user',
+      'createdBy',
+      'ticketTypes',
+    ]);
 
     const user = await this.userService.findOneByEmail(email);
     if (user.organizationProfile) {
@@ -177,12 +182,10 @@ export class EventService {
     const eventLike = new EventLike();
     eventLike.user = user.profile;
 
-    this.eventRepository.save({
+    return this.eventRepository.save({
       ...event,
       likes: [...(event.likes ?? []), eventLike],
     });
-
-    return eventLike;
   }
 
   async unlikeEvent(id: number, email: string) {
@@ -190,6 +193,8 @@ export class EventService {
       'likes',
       'likes.user',
       'likes.event',
+      'createdBy',
+      'ticketTypes',
     ]);
 
     const user = await this.userService.findOneByEmail(email);
