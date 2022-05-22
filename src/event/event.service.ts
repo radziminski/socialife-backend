@@ -46,7 +46,11 @@ export class EventService {
     event.likes = [];
     event.files = [];
 
-    return this.eventRepository.save(event);
+    const newEvent = await this.eventRepository.save(event);
+    return {
+      ...newEvent,
+      likesNum: 0,
+    };
   }
 
   async findAll() {
