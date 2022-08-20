@@ -39,7 +39,7 @@ services:
       - PG_HOST=${PG_HOST}
       - PG_PORT=${PG_PORT}
       - PG_DATABASE=${PG_DATABASE}
-      - PORT=${API_PORT}
+      - PORT=${PORT}
       - CHOKIDAR_USEPOLLING=true
     ports:
-      - '${API_PORT}:${API_PORT}'
+      - '${PORT}:${PORT}'
