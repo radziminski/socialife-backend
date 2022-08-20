@@ -43,17 +43,13 @@ jobs:
           cp package* deployment
           cp .nvmrc deployment
           cd deployment
-          zip -r deploy.zip . -x '*.git*'
 
-      # Deploys the package to AWS EB
-      - name: Deploy to EB 📤
+      # Deploys the package to Heroku
+      - name: Deploy to Heroku 🚀
         if: github.ref == 'refs/heads/main'
-        uses: einaregilsson/beanstalk-deploy@v16
+        uses: akhileshns/heroku-deploy@v3.12.12
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: socialife
-          environment_name: socialife-prod-env
-          version_label: ${{ github.run_id }}
-          region: ${{ secrets.AWS_REGION }}
-          deployment_package: deployment/deploy.zip
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          appdir: 'deployment'

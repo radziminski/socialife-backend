@@ -44,16 +44,28 @@ export const { RDS_PASSWORD } = process.env;
 export const { RDS_PORT } = process.env;
 
 // DB
-export const DB_CONFIG: ConnectionOptions = {
+export const DB_LOCAL_CONFIG: ConnectionOptions = {
   type: 'postgres',
-  host: RDS_HOSTNAME ?? PG_HOST,
-  port: Number(RDS_PORT ?? PG_PORT),
-  username: RDS_USERNAME ?? PG_USER,
-  password: RDS_PASSWORD ?? PG_PASSWORD,
-  database: RDS_DB_NAME ?? PG_DATABASE,
+  host: PG_HOST,
+  port: Number(PG_PORT),
+  username: PG_USER,
+  password: PG_PASSWORD,
+  database: PG_DATABASE,
   entities: ['dist/**/*.entity{.ts,.js}'],
   synchronize: true,
 };
+
+export const DB_PROD_CONFIG: ConnectionOptions = {
+  url: process.env.DATABASE_URL,
+  type: 'postgres',
+  ssl: {
+    rejectUnauthorized: false,
+  },
+  entities: ['dist/**/*.entity{.ts,.js}'],
+  synchronize: true,
+};
+
+export const DB_CONFIG = ENV === 'dev' ? DB_LOCAL_CONFIG : DB_PROD_CONFIG;
 
 // PROVIDERS
 export const PROVIDERS = {
