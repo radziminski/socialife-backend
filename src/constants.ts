@@ -16,8 +16,8 @@ export const { ADMIN_EMAIL } = process.env;
 export const { ADMIN_PASSWORD } = process.env;
 
 // AWS S3 - ASSETS
-export const ASSETS_STORAGE: 'local' | 'external' =
-  ENV === 'dev' ? 'local' : 'external';
+// @todo: add external assets storage
+export const ASSETS_STORAGE: 'local' | 'external' = 'local';
 export const { ASSETS_BASE_URL } = process.env;
 
 export const { AWS_ACCESS_KEY_ID } = process.env;
