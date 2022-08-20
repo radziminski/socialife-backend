@@ -17,33 +17,6 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
 
-      - name: Use Node v${{ matrix.node-version }} 🧑🏻‍💻
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install npm dependencies 👪
-        run: npm ci
-
-      - name: Lint & format code 🧹
-        run: npm run lint && npm run format
-
-      - name: Build app 🛠
-        run: npm run build
-
-      - name: Run unit tests 👮‍♀️
-        run: npm run test
-
-      # Zips the deploy package
-      - name: Generate deployment package 👷🏻‍♂️
-        if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir deployment
-          cp -r dist deployment
-          cp package* deployment
-          cp .nvmrc deployment
-          cd deployment
-
       # Deploys the package to Heroku
       - name: Deploy to Heroku 🚀
         if: github.ref == 'refs/heads/main'
@@ -52,4 +25,4 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-          appdir: 'deployment'
+          usedocker: true

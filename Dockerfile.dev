@@ -1,20 +1,30 @@
-# --- Running Development Server
-
-FROM node:alpine
+FROM node:14-alpine as builder
 
 WORKDIR '/app'
 
-COPY ./package*.json .
+# Copy package files 
+COPY 'package.json' '/app'
+COPY 'package-lock.json' '/app'
 
-RUN npm install
+# Installing dependencies
+RUN npm ci
 
-# Volumes set in docker-compose
+# Copy source code
+COPY '.' '/app/'
 
-ENV NODE_ENV='development'
+ENV NODE_ENV=production
 
-# Making folder for local files
-RUN mkdir '/app/files'
-RUN mkdir '/app/files/audio'
-RUN ls -alt /app > tst
+# Building optimized build
+RUN npm run build
 
-CMD ["npm", "run", "start:dev"]
+# Run the app
+FROM node:14-alpine
+
+WORKDIR '/app'
+
+# Copying packages and build folders 
+COPY --from=builder '/app/package*.json' '/app/'
+COPY --from=builder '/app/node_modules' '/app/node_modules/'
+COPY --from=builder '/app/dist' '/app/dist/'
+
+CMD ["node", "dist/main.js"]
