@@ -224,7 +224,7 @@ export class UserService {
 
     return this.userRepository.save({
       ...user,
-      organizationProfile: { ...newProfile },
+      organizationProfile: { ...user.organizationProfile, ...newProfile },
     });
   }
 

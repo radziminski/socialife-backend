@@ -13,9 +13,12 @@ export const isOrganizationProfile = (
 
 export const isUpdateOrganizationProfileDto = (
   profile: UpdateProfileDto | UpdateOrganizationProfileDto,
-): profile is UpdateOrganizationProfileDto => {
-  return Boolean((profile as UpdateOrganizationProfileDto).name);
-};
+): profile is UpdateOrganizationProfileDto =>
+  Boolean((profile as UpdateOrganizationProfileDto).name) ||
+  Boolean((profile as UpdateOrganizationProfileDto).coverUrl) ||
+  Boolean((profile as UpdateOrganizationProfileDto).website) ||
+  Boolean((profile as UpdateOrganizationProfileDto).description) ||
+  Boolean((profile as UpdateOrganizationProfileDto).city);
 
 export const isCreateOrganizationProfileDto = (
   profile: CreateProfileDto | CreateOrganizationProfileDto,
