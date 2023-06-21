@@ -17,4 +17,8 @@ export class CreateOrganizationProfileDto {
   @IsString()
   @IsOptional()
   city?: string;
+
+  @IsString()
+  @IsOptional()
+  coverUrl?: string;
 }

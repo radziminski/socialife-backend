@@ -177,6 +177,7 @@ export class UserService {
     organizationProfile.website = profile.website;
     organizationProfile.region = profile.region;
     organizationProfile.city = profile.city;
+    organizationProfile.coverUrl = profile.coverUrl;
 
     return this.userRepository.save({
       ...organization,
