@@ -54,10 +54,25 @@ export class EventService {
     };
   }
 
-  async findAll() {
-    const events = await this.eventRepository.find({ relations: ['likes'] });
+  async findAll(email: string) {
+    const events = await this.eventRepository.find({
+      relations: ['likes', 'likes.user'],
+    });
 
-    return events.map((event) => this.convertLikesToLikesNumber(event));
+    const user = await this.userService.findOneByEmail(email);
+    if (!user.profile) {
+      throw new BadRequestException('Create user profile first');
+    }
+
+    const eventsWithoutLikes = events.map((event) =>
+      this.convertLikesToLikesNumber(event),
+    );
+
+    const isLiked = events.map((event) =>
+      event.likes.some((like) => like.user.id === user.profile.id),
+    );
+
+    return { ...eventsWithoutLikes, isLiked };
   }
 
   async findAllForOrganization(organizationEmail: string) {

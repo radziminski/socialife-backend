@@ -51,6 +51,32 @@ export class UserService {
     return user;
   }
 
+  async findOneByEmailWithLikes(email: string, validate = true) {
+    const user = await this.userRepository.findOne({
+      relations: ['profile', 'profile.eventLikes', 'organizationProfile'],
+      where: { email },
+    });
+
+    if (!user && validate) {
+      throw new BadRequestException({ message: 'User not found' });
+    }
+
+    if (user.organizationProfile || !user.profile) {
+      return user;
+    }
+
+    const likedEventsNumber = user.profile.eventLikes?.length ?? 0;
+    const { eventLikes: _, ...restProfile } = user.profile;
+
+    return {
+      ...user,
+      profile: {
+        ...restProfile,
+        likedEventsNumber,
+      },
+    };
+  }
+
   async findProfileByEmail(email: string, validate = true) {
     const user = await this.findOneByEmail(email, validate);
 
@@ -62,7 +88,7 @@ export class UserService {
   }
 
   async findOneByEmailWithUnifiedProfile(email: string, validate = true) {
-    const user = await this.findOneByEmail(email, validate);
+    const user = await this.findOneByEmailWithLikes(email, validate);
 
     const { profile, organizationProfile, ...restUser } = user;
 
@@ -109,6 +135,20 @@ export class UserService {
 
   async getProfile(email: string) {
     const user = await this.findOneByEmail(email);
+
+    const profile = user.profile ?? user.organizationProfile;
+
+    if (!profile) {
+      throw new BadRequestException({
+        message: 'User does not have a profile',
+      });
+    }
+
+    return user.profile ?? user.organizationProfile;
+  }
+
+  async getProfileWithLikes(email: string) {
+    const user = await this.findOneByEmailWithLikes(email);
 
     const profile = user.profile ?? user.organizationProfile;
 

@@ -36,8 +36,8 @@ export class EventController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.eventService.findAll();
+  findAll(@Request() req: RequestWithUser) {
+    return this.eventService.findAll(req.user.email);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
