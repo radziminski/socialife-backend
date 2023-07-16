@@ -64,15 +64,16 @@ export class EventService {
       throw new BadRequestException('Create user profile first');
     }
 
-    const eventsWithoutLikes = events.map((event) =>
+    const eventsWithIsLiked = events.map((event) => ({
+      ...event,
+      isLiked: event.likes.some((like) => like.user.id === user.profile.id),
+    }));
+
+    const eventsWithoutLikes = eventsWithIsLiked.map((event) =>
       this.convertLikesToLikesNumber(event),
     );
 
-    const isLiked = events.map((event) =>
-      event.likes.some((like) => like.user.id === user.profile.id),
-    );
-
-    return { ...eventsWithoutLikes, isLiked };
+    return eventsWithoutLikes;
   }
 
   async findAllForOrganization(organizationEmail: string) {
