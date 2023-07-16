@@ -53,7 +53,12 @@ export class UserService {
 
   async findOneByEmailWithLikes(email: string, validate = true) {
     const user = await this.userRepository.findOne({
-      relations: ['profile', 'profile.eventLikes', 'organizationProfile'],
+      relations: [
+        'profile',
+        'profile.eventLikes',
+        'profile.eventLikes.event',
+        'organizationProfile',
+      ],
       where: { email },
     });
 
@@ -65,7 +70,10 @@ export class UserService {
       return user;
     }
 
-    const likedEventsNumber = user.profile.eventLikes?.length ?? 0;
+    const likedEventsNumber =
+      user.profile.eventLikes.filter((like) => Boolean(like.event))?.length ??
+      0;
+
     const { eventLikes: _, ...restProfile } = user.profile;
 
     return {
